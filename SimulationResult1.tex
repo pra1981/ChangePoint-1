@@ -1,0 +1,250 @@
+\documentclass[12pt]{article}
+\usepackage{times}
+\usepackage{multirow}
+\usepackage{diagbox}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\topmargin 0.0cm
+\oddsidemargin 0.2cm
+\textwidth 16cm 
+\textheight 23cm
+\footskip 1.0cm
+\newenvironment{sciabstract}{%
+\begin{quote} \bf}
+{\end{quote}}
+\renewcommand\refname{References and Notes}
+\newcounter{lastnote}
+\newenvironment{scilastnote}{%
+\setcounter{lastnote}{\value{enumiv}}%
+\addtocounter{lastnote}{+1}%
+\begin{list}%
+{\arabic{lastnote}.}
+{\setlength{\leftmargin}{.22in}}
+{\setlength{\labelsep}{.5em}}}
+{\end{list}}
+
+
+
+\title{Simulation Result}
+\begin{document}
+We compared our method SIFS with two types of LS-TV method.
+
+First one is given the $K^{\star}$ true number of change points and the upper bound of change point which is $3K^{\star}$.  
+
+Second one is given the upper bound of change point which is $3K^{\star}$ and estimate the number of change points with this rule: $\hat{K}=argmin \; \frac{J(K+1)}{J(K)}>1-\lambda$ where $\lambda=0.05$.  
+
+Furthermore, we will test under differen settings. First setting is the change point is fixed and the $\mu$ is also fixed. 
+\begin{table}[h]
+\centering
+\caption{Simulation Result of n=1000}
+\vspace{1em}
+\begin{tabular}{|c|c|cc|cc|cc|} 
+\hline
+\multicolumn{2}{|c|}{} &\multicolumn{2}{|c|}{Low Noise} &\multicolumn{2}{|c|}{Medium Noise} &\multicolumn{2}{|c|}{High Noise}  \\
+\hline
+Method & Criteria &  Mean & SD  &  Mean & SD &  Mean & SD \\
+\hline
+\multirow{4}*{SIFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	& 0.00000   	& 0.00000   	& 0.00011  	& 0.00034   	& 0.00345  	&  0.00242\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00329    	&0.01909  	& 0.00201   	& 0.01338 	&  0.01095     &  0.02211\\
+						&FDR   								& 0.00231    	&0.01319  	& 0.00987    & 0.02688 	&  0.23069     &0.10778\\
+						&PDR   								&1.00000     	&0.00000   	& 0.99167    & 0.02513 	&  0.78750     &0.10215\\
+\hline
+\multirow{4}*{LS-TV(K=11)} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00025   	&0.00044   	& 0.00024   	& 0.00043   	& 0.00609  	&  0.00802\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00025    	&0.00044  	& 0.00024  	& 0.00043 	&  0.01039   &0.02852\\
+						&FDR  								& 0.02083    	&0.03627  	& 0.02000   	& 0.03577 	&  0.14250   &0.07883\\
+						&PDR   								& 0.97917    	&0.03627  	& 0.98000   	& 0.03577 	&  0.85750   &0.07883\\
+ \hline
+\multirow{4}*{LS-TV} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00003   	&0.00018   	& 0.00001   & 0.00010   	& 0.01370  	&  0.01001\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.05583    	&0.05444  	& 0.05022	& 0.05486 	&  0.00729   &0.02807\\
+						&FDR  								& 0.08812    	&0.04724  	& 0.07902   	& 0.05117 	&  0.13074   &0.08609\\
+						&PDR   								& 0.99750    	&0.01429  	& 0.99917   	& 0.00833 	&  0.82500   &0.09213\\
+ \hline
+\end{tabular}
+
+\caption{Simulation Result of n=5000}
+\vspace{1em}
+\begin{tabular}{|c|c|cc|cc|cc|} 
+\hline
+\multicolumn{2}{|c|}{} &\multicolumn{2}{|c|}{Low Noise} &\multicolumn{2}{|c|}{Medium Noise} &\multicolumn{2}{|c|}{High Noise}  \\
+\hline
+Method & Criteria &  Mean & SD  &  Mean & SD &  Mean & SD \\
+\hline
+\multirow{4}*{SIFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	& 0.00000   	& 0.00000   	& 0.00001  	& 0.00007   	& 0.00099  	&  0.00084\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00000    	&0.00000  	& 0.00151   	& 0.00992 	&  0.00143     &  0.00393\\
+						&FDR   								& 0.00000    	&0.00000  	& 0.00718    & 0.02543 	&  0.21404     &0.09321\\
+						&PDR   								&1.00000     	&0.00000   	& 0.99583    & 0.01825 	&  0.78833     &0.09206\\
+\hline
+\multirow{4}*{LS-TV(K=11)} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00004   	&0.00008   	& 0.00004   	& 0.00008   	& 0.00329  	&  0.00710\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00004    	&0.00008  	& 0.00004  	& 0.00008 	&  0.00454   &0.02315\\
+						&FDR  								& 0.01667    	&0.03350  	& 0.01667   	& 0.03350 	&  0.13833   &0.09268\\
+						&PDR   								& 0.98333    	&0.03350  	& 0.98333   	& 0.03350 	&  0.86167   &0.09268\\
+ \hline
+\multirow{4}*{LS-TV} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00001   	&0.00004   	& 0.00001   & 0.00002   	& 0.01099  	&  0.00992\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.04173    	&0.05013  	& 0.04177	& 0.05150 	&  0.02131   &0.01819\\
+						&FDR  								& 0.06387    	&0.04549  	& 0.06973   	& 0.03192 	&  0.12431   &0.08361\\
+						&PDR   								& 0.99583    	&0.01825  	& 0.99833   	& 0.01173 	&  0.83250   &0.09288\\
+ \hline
+\end{tabular}
+
+\end{table}
+
+
+\newpage
+
+Second setting is the change point is random but the $\mu$ is still fixed. 
+
+
+\begin{table}[h]
+\centering
+\caption{Simulation Result of n=1000}
+\vspace{1em}
+\begin{tabular}{|c|c|cc|cc|cc|} 
+\hline
+\multicolumn{2}{|c|}{} &\multicolumn{2}{|c|}{Low Noise} &\multicolumn{2}{|c|}{Medium Noise} &\multicolumn{2}{|c|}{High Noise}  \\
+\hline
+Method & Criteria &  Mean & SD  &  Mean & SD &  Mean & SD \\
+\hline
+\multirow{4}*{SIFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	& 0.00001   	& 0.00010   	& 0.00004  	& 0.00019   	& 0.00395  	&  0.00356\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00261    	&0.01258  	& 0.00511   	& 0.02001 	&  0.01090     &  0.02497\\
+						&FDR   								& 0.00538    	&0.02255  	& 0.01173    & 0.03014 	&  0.24411     &0.10699\\
+						&PDR   								&0.99917     	&0.00833   	& 0.99667    & 0.01641 	&  0.76750     &0.10547\\
+\hline
+\multirow{4}*{LS-TV(K=11)} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00021   	&0.00041   	& 0.00025   	& 0.00044   	& 0.00662  	&  0.00788\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00021    	&0.00041  	& 0.00025  	& 0.00044 	&  0.02357   &0.04519\\
+						&FDR  								& 0.01750    	&0.03411  	& 0.02083   	& 0.03627 	&  0.14917   &0.09423\\
+						&PDR   								& 0.98250    	&0.03411  	& 0.97917   	& 0.03627 	&  0.85083   &0.09423\\
+ \hline
+\multirow{4}*{LS-TV} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00001   	&0.00010   	& 0.00004   & 0.00020   	& 0.01194  	&  0.00911\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.04791    	&0.05504  	& 0.04187	& 0.04673 	&  0.00973   &0.03389\\
+						&FDR  								& 0.07660    	&0.05469  	& 0.08083   	& 0.05270 	&  0.12878   &0.09630\\
+						&PDR   								& 0.99917    	&0.00833  	& 0.99667   	& 0.01641 	&  0.83083   &0.09583\\
+ \hline
+\end{tabular}
+
+\caption{Simulation Result of n=5000}
+\vspace{1em}
+\begin{tabular}{|c|c|cc|cc|cc|} 
+\hline
+\multicolumn{2}{|c|}{} &\multicolumn{2}{|c|}{Low Noise} &\multicolumn{2}{|c|}{Medium Noise} &\multicolumn{2}{|c|}{High Noise}  \\
+\hline
+Method & Criteria &  Mean & SD  &  Mean & SD &  Mean & SD \\
+\hline
+\multirow{4}*{SIFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	& 0.00000   	& 0.00000   	& 0.00001  	& 0.00007   	& 0.00103  	&  0.00096\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00273    	&0.00124  	& 0.00067   	& 0.00504 	&  0.00256     &  0.00772\\
+						&FDR   								& 0.00385    	&0.01695  	& 0.00487    & 0.01939 	&  0.24808     &0.10526\\
+						&PDR   								&1.00000     	&0.00000   	& 0.99667    & 0.01641 	&  0.75833    &0.10494\\
+\hline
+\multirow{4}*{LS-TV(K=11)} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00004   	&0.00008   	& 0.00005   	& 0.00008   	& 0.00311  	&  0.00677\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00004    	&0.00008  	& 0.00005  	& 0.00008 	&  0.00763   &0.02604\\
+						&FDR  								& 0.01750    	&0.03411  	& 0.01917   	& 0.03525 	&  0.13750   &0.09503\\
+						&PDR   								& 0.9825    	&0.03411  	& 0.98083   	& 0.03525 	&  0.86250   &0.09503\\
+ \hline
+\multirow{4}*{LS-TV} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00004   	&0.00002   	& 0.00000   & 0.00000   	& 0.01199  	&  0.00956\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.05269    	&0.05731  	& 0.04442	& 0.05115 	&  0.00031   &0.00030\\
+						&FDR  								& 0.06789    	&0.04414  	& 0.06640   	& 0.03384 	&  0.12090   &0.08658\\
+						&PDR   								& 0.99833    	&0.01173  	& 1.00000   	& 0.00000 	&  0.83000   &0.09904\\
+ \hline
+\end{tabular}
+
+\end{table}
+
+\newpage
+The following table show the simulation result of  p=1. 
+
+
+\begin{table}[h]
+\centering
+\caption{Simulation Result of n=1000}
+\vspace{1em}
+\begin{tabular}{|c|c|cc|cc|} 
+\hline
+\multicolumn{2}{|c|}{} &\multicolumn{2}{|c|}{Low Noise} &\multicolumn{2}{|c|}{Medium Noise}\\
+\hline
+Method & Criteria &  Mean & SD  &  Mean & SD \\
+\hline
+\multirow{4}*{SIFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	& 0.54988   	& 0.00248   	& 0.55000  	& 0.00260    \\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00832    	&0.02668  	& 0.00568   	& 0.02023 	\\
+						&FDR   								& 0.24417    	&0.15725  	& 0.23667    & 0.16271 	\\
+						&PDR   								&0.38500    	&0.07747   	& 0.38500    & 0.07747 	\\
+\hline
+\multirow{4}*{SBFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00053   	&0.00098   	& 0.00260   	& 0.00422   	\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00118    	&0.00652  	& 0.00425  	& 0.01687 	\\
+						&FDR  								& 0.12143    	&0.17380  	& 0.21429   	& 0.19912 	\\
+						&PDR   								& 0.88000    	&0.17421  	& 0.78667   	& 0.19831 	\\
+ \hline
+
+\end{tabular}
+
+\caption{Simulation Result of n=5000}
+\vspace{1em}
+\begin{tabular}{|c|c|cc|cc|cc|} 
+\hline
+\multicolumn{2}{|c|}{} &\multicolumn{2}{|c|}{Low Noise} &\multicolumn{2}{|c|}{Medium Noise} \\
+\hline
+Method & Criteria &  Mean & SD  &  Mean & SD \\
+\hline
+\multirow{4}*{SIFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	& 0.00733   	&0.00983   	& 0.00864  	& 0.01324   	\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.04089    	&0.05776  	& 0.03086   	& 0.04882 	\\
+						&FDR   								& 0.47604    	&0.14399  	& 0.44619    & 0.14426 	\\
+						&PDR   								&0.38833    	&0.08225   	& 0.39333    & 0.08040 	\\
+\hline
+\multirow{4}*{SBFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00013   	&0.00020   	& 0.00044   	& 0.00074   	\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00013    	&0.00020  	& 0.00044  	& 0.00074 	\\
+						&FDR  								& 0.14000    	&0.16535  	& 0.22333   	& 0.19566 	\\
+						&PDR   								& 0.86000   	&0.16535  	& 0.77667   	& 0.19566 	\\
+ \hline
+
+\end{tabular}
+
+\end{table}
+
+\newpage
+The following table show the simulation result of  p=5. 
+
+
+\begin{table}[h]
+\centering
+\caption{Simulation Result of n=1000}
+\vspace{1em}
+\begin{tabular}{|c|c|cc|cc|} 
+\hline
+\multicolumn{2}{|c|}{} &\multicolumn{2}{|c|}{Low Noise} &\multicolumn{2}{|c|}{Medium Noise}\\
+\hline
+Method & Criteria &  Mean & SD  &  Mean & SD \\
+\hline
+\multirow{4}*{SIFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	& 0.00278   	& 0.00317   	& 0.00317  	& 0.00354    \\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.04580    	&0.06349 	& 0.04688   	& 0.06193 	\\
+						&FDR   								& 0.42080    	&0.10282  	& 0.42255    & 0.09071 	\\
+						&PDR   								&0.50200     	&0.05682   	& 0.49600    & 0.06017 	\\
+\hline
+\multirow{4}*{SBFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00026   	&0.00058   	& 0.00028   	& 0.00057   	\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00109    	&0.00791  	& 0.00060  	& 0.00351 	\\
+						&FDR  								& 0.28451    	&0.10658  	& 0.29209   	& 0.11762 	\\
+						&PDR   								& 0.93400    	&0.13198  	& 0.92200   	& 0.15148 	\\
+ \hline
+
+\end{tabular}
+
+\caption{Simulation Result of n=5000}
+\vspace{1em}
+\begin{tabular}{|c|c|cc|cc|cc|} 
+\hline
+\multicolumn{2}{|c|}{} &\multicolumn{2}{|c|}{Low Noise} &\multicolumn{2}{|c|}{Medium Noise} \\
+\hline
+Method & Criteria &  Mean & SD  &  Mean & SD \\
+\hline
+\multirow{4}*{SIFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	& 0.01113   	&0.02008   	& 0.00823  	& 0.01227   	\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.05946    	&0.06284  	& 0.03930   	& 0.05603 	\\
+						&FDR   								& 0.45662    	&0.15054  	& 0.44752    & 0.14726 	\\
+						&PDR   								&0.41667     	&0.09025   	& 0.40167    & 0.09204 	\\
+\hline
+\multirow{4}*{SBFS} 	& $\varepsilon(\hat{T}\|T^{\star})$  	&0.00013   	&0.0002   	& 0.00065   	& 0.00142   	\\
+						&$\varepsilon(T^{\star}\|\hat{T})$   	& 0.00140    	&0.01269  	& 0.00065  	& 0.00142 	\\
+						&FDR  								& 0.13429    	&0.17861  	& 0.18667   	& 0.18544 	\\
+						&PDR   								& 0.86667   	&0.17727  	& 0.81333   	& 0.18544 	\\
+ \hline
+
+\end{tabular}
+
+\end{table}
+\end{document}
