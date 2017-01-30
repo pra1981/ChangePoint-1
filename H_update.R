@@ -1,6 +1,8 @@
 require(lars)
 require(MASS)
-##Function
+require(cpm)
+
+## Function
 Summary =function(S,Y,X,Z){
     if (is.null(S)){
         coef=lm(Y~X-1)$coefficients
@@ -101,7 +103,16 @@ PDR_bias=function(M1,M2){
     names(output)=c("FDR","PDR")
     return(output)
 }
-##SLasso Detection
+makeTable = function(sim_list){
+  mean_table=t(sapply(sim_list,colMeans))
+  row.names(mean_table)=names(sim_list)
+  print(round(mean_table,4))
+  sd_table=t(sapply(sim_list,function(x) apply(x,2,sd)))
+  row.names(sd_table)=names(sim_list)
+  print(round(sd_table,4))
+}
+
+## SLasso Detection
 SIFS = function(X,Y,n,p,normalize=TRUE){
     EBIC= function(S,projH){
         full=(n-1)*(p+1)
@@ -262,6 +273,7 @@ SBFS = function(X,Y,n,p){
     rm(temp_rms,temp_t,inter_ebic,temp_ebic,new_ebic,ebic,tebic,temp_new_S,new_S,ST,TA,ybar)
     estimation=Summary(S,Y,X,Z)
 }
+## LS_TV
 LS_TV= function(Y,n,K_max,K_chs){
     Z = matrix(0,n,n)
     for (t in 1:n){
@@ -359,58 +371,44 @@ LS_TV= function(Y,n,K_max,K_chs){
     estimation=Summary(bp,Y,matrix(1,n,1),Z[,-1])
     return(estimation)
 }
-##Settings
-n=100
-sigma=0.05
-p=0
-K=12
-
-##Initial Setup
-break_point = c(10, 13, 15, 23, 25, 40, 44, 65, 76, 78, 81)*n/100
-break_point_ex = c(0,break_point,n)
-diff_bp = diff(break_point_ex)
+## https://www.r-bloggers.com/change-point-detection-in-time-series-with-r-and-tableau/ other methods
+CPM  = function(Y){
+  Z = matrix(0,n,n)
+  for (t in 1:n){
+    Z[t:n,t] = 1 
+  }
+  
+  bp = NULL
+  y = Y
+  last_bp = 0
+  repeat{
+    cpm_tmp = detectChangePoint(y,"Student")
+    if (cpm_tmp$changeDetected ){
+      last_bp = last_bp + cpm_tmp$detectionTime-1
+      bp = c(bp, last_bp)
+      y = Y[ (last_bp+1):n ]
+    } else {
+      break
+    }	
+  }
+  
+  estimation=Summary(bp,Y,matrix(1,n,1),Z[,-1])
+  return(estimation)
+}
 
 #Y = matrix(0,n,1)
 # Beta = NULL
 # for (bp in 1:K){
-#     beta = runif(p+1,bp,1+bp)
+#     beta = runif(p+1,bp,1+bp)  # random beta
 #     Y = Y + diag(c(rep(0,break_point[bp]),rep(1,diff_bp[bp]),rep(0,n-break_point[bp+1])))%*% X %*% beta
 #     Beta = cbind(Beta,beta)
 # }
 
-# Beta = cbind(
-#     c(1, 1, 1, 0, 0, 1, 2, -1, 0, 0, 1.2, 0),    
-#     c(1.2, 1.1, 1, 0, 0, -1, 1.8, 1, 0, 0, 1, 0),
-#     c(1.8, 1.2, 1, 0, 0, 0, 1.6, 0, 0, 0, 0.8, 0)
-# )
-Beta = matrix(c(0  ,40 ,-10 , 20 ,-20 , 30, -12 ,  9  ,52  ,21 , 42  , 0)/20 -0.8,nrow=1,byrow = TRUE)
-raw_Beta=matrix(0,p+1,n)
-raw_Beta[,c(0,break_point)+1]=Beta[1:(p+1),]
-# X = matrix(rnorm(n*p),n,p)
-# X = cbind(rep(1,n),X)
-# for (bp in 1:K){
-#     Y = Y + diag(c(rep(0,break_point_ex[bp]),rep(1,diff_bp[bp]),rep(0,n-break_point_ex[bp+1])))%*% X %*% Beta[1:(p+1),bp]
-# }
-# E = matrix(rnorm(n,0,sigma),n,1)
-# Y = Y + E
 
-
-
-##Evaluation
-# estimation_SIFS=SIFS(X,Y,n,p)
-# estimation_SBFS=SBFS(X,Y,n,p)
-# estimation_LSTV=LS_TV(Y,n,33,11)
-# 
-# break_point
-# estimation_SIFS$Break_Point
-# estimation_SBFS$Break_Point
-# Beta[1:(p+1),]
-# estimation_SIFS$Beta
-# estimation_SBFS$Beta
-################################################################################################
+#############################################   No Covariates   ###################################################
 ##Settings
-n=1000
-sigma=0.5
+n=200
+sigma=0.05
 p=0
 K=12
 ##Initial Setup
@@ -429,26 +427,25 @@ for (i in 1:100){
     X = cbind(rep(1,n),X)
     Y = matrix(0,n,1)
     ##Setting 1
-    #for (bp in 1:K){
-    #    Y = Y + diag(c(rep(0,break_point_ex[bp]),rep(1,diff_bp[bp]),rep(0,n-break_point_ex[bp+1])))%*% X %*% Beta[1:(p+1),bp]
-    #}
-    ##Setting 2
-    idx=sample(1:12,n,replace=TRUE,prob=c(0.1, 0.03, 0.02, 0.08, 0.02, 0.15, 0.04, 0.21, 0.11, 0.02, 0.03,0.19))
-    idx=idx[order(idx)]
-    break_point=which(diff(idx)==1)
-    raw_Beta=matrix(0,p+1,n)
-    raw_Beta[,c(0,break_point)+1]=Beta[p+1,]
-    
-    for ( j in 1:n){
-        Y[j]=X[j,]%*% Beta[idx[j]]
+    for (bp in 1:K){
+        Y = Y + diag(c(rep(0,break_point_ex[bp]),rep(1,diff_bp[bp]),rep(0,n-break_point_ex[bp+1])))%*% X %*% Beta[1:(p+1),bp]
     }
+    ##Setting 2
+    #idx=sample(1:12,n,replace=TRUE,prob=c(0.1, 0.03, 0.02, 0.08, 0.02, 0.15, 0.04, 0.21, 0.11, 0.02, 0.03,0.19))
+    #idx=idx[order(idx)]
+    #break_point=which(diff(idx)==1)
+    #raw_Beta=matrix(0,p+1,n)
+    #raw_Beta[,c(0,break_point)+1]=Beta[1:(p+1),]
+    #    for ( j in 1:n){
+    #    Y[j]=X[j,]%*% Beta[idx[j]]
+    #}
+    
     ##Add Noise
     E = matrix(rnorm(n,0,sigma),n,1)
     Y = Y + E
     
     ##Evaluation
-    estimation_SIFS=SIFS(X,Y,n,p,FALSE)
-    estimation_SIFS_nor=SIFS(X,Y,n,p,TRUE)
+    estimation_SIFS=SIFS(X,Y,n,p,TRUE)
     estimation_LSTV_1=LS_TV(Y,n,3*(K-1),K-1)
     estimation_LSTV_2=LS_TV(Y,n,3*(K-1),-1)
     result_SIFS=rbind(result_SIFS,c(
@@ -456,12 +453,6 @@ for (i in 1:100){
         dist_err(estimation_SIFS$Break_Point,break_point)/n,
         PDR_FDR(estimation_SIFS$raw_beta,raw_Beta),
         PDR_bias(estimation_SIFS$raw_beta,raw_Beta))
-    )
-    result_SIFS_nor=rbind(result_SIFS_nor,c(
-        dist_err(break_point,estimation_SIFS_nor$Break_Point)/n,
-        dist_err(estimation_SIFS_nor$Break_Point,break_point)/n,
-        PDR_FDR(estimation_SIFS_nor$raw_beta,raw_Beta),
-        PDR_bias(estimation_SIFS_nor$raw_beta,raw_Beta))
     )
     result_LSTV_1=rbind(result_LSTV_1,c(
         dist_err(break_point,estimation_LSTV_1$Break_Point)/n,
@@ -477,23 +468,14 @@ for (i in 1:100){
     )
     print(i)
 }
+sim_list2=list(SIFS_normalized=result_SIFS_nor,LS_TV1=result_LSTV_1,LS_TV2=result_LSTV_2)
+makeTable(sim_list2)
 
-result=result_SIFS
-colMeans(result)
-apply(result,2,sd)
-result=result_SIFS_nor
-colMeans(result)
-apply(result,2,sd)
-result=result_LSTV_1
-colMeans(result)
-apply(result,2,sd)
-result=result_LSTV_2
-colMeans(result)
-apply(result,2,sd)
 
-##################################################################################
+
+####################################  Covariates Involved   ##############################################
 n=1000
-sigma=0.05
+sigma=0.1
 p=1
 K=3
 break_point = c(25,80)*n/100
