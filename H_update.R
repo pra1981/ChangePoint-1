@@ -1,7 +1,8 @@
 require(lars)
 require(MASS)
 require(cpm)
-
+require(bcp)
+require(ecp)
 ## Function
 Summary =function(S,Y,X,Z){
     if (is.null(S)){
@@ -395,7 +396,31 @@ CPM  = function(Y){
   estimation=Summary(bp,Y,matrix(1,n,1),Z[,-1])
   return(estimation)
 }
+BCP  = function(Y){
+  Z = matrix(0,n,n)
+  for (t in 1:n){
+    Z[t:n,t] = 1 
+  }
+  bcp_fit = bcp(Y)
+  bp = 1:(n-1)
+  bp = bp[bcp_fit$posterior.prob[1:(n-1)]>0.95]
 
+  
+  estimation=Summary(bp,Y,matrix(1,n,1),Z[,-1])
+  return(estimation)
+}
+ECP  = function(Y){
+  Z = matrix(0,n,n)
+  for (t in 1:n){
+    Z[t:n,t] = 1 
+  }
+  ecp_fit = e.divisive(Y)
+
+  bp = ecp_fit$estimates[c(-1,-length(ecp_fit$estimates))]-1
+  
+  estimation=Summary(bp,Y,matrix(1,n,1),Z[,-1])
+  return(estimation)
+}
 #Y = matrix(0,n,1)
 # Beta = NULL
 # for (bp in 1:K){
@@ -407,7 +432,7 @@ CPM  = function(Y){
 
 #############################################   No Covariates   ###################################################
 ##Settings
-n=200
+n=2000
 sigma=0.05
 p=0
 K=12
@@ -418,10 +443,12 @@ diff_bp = diff(break_point_ex)
 Beta = matrix(c(0  ,40 ,-10 , 20 ,-20 , 30, -12 ,  9  ,52  ,21 , 42  , 0)/20 -0.8,nrow=1,byrow = TRUE)
 raw_Beta=matrix(0,p+1,n)
 raw_Beta[,c(0,break_point)+1]=Beta[1:(p+1),]
-result_SIFS_nor=NULL
 result_SIFS=NULL
 result_LSTV_1=NULL
 result_LSTV_2=NULL
+result_cpm=NULL
+result_bcp=NULL
+result_ecp=NULL
 for (i in 1:100){
     X = matrix(rnorm(n*p),n,p)
     X = cbind(rep(1,n),X)
@@ -448,6 +475,10 @@ for (i in 1:100){
     estimation_SIFS=SIFS(X,Y,n,p,TRUE)
     estimation_LSTV_1=LS_TV(Y,n,3*(K-1),K-1)
     estimation_LSTV_2=LS_TV(Y,n,3*(K-1),-1)
+    estimation_cpm=CPM(Y)
+    estimation_bcp=BCP(Y)
+    estimation_ecp=ECP(Y)
+    
     result_SIFS=rbind(result_SIFS,c(
         dist_err(break_point,estimation_SIFS$Break_Point)/n,
         dist_err(estimation_SIFS$Break_Point,break_point)/n,
@@ -466,11 +497,29 @@ for (i in 1:100){
         PDR_FDR(estimation_LSTV_2$raw_beta,raw_Beta),
         PDR_bias(estimation_LSTV_2$raw_beta,raw_Beta))
     )
+    result_cpm=rbind(result_cpm,c(
+      dist_err(break_point,estimation_cpm$Break_Point)/n,
+      dist_err(estimation_cpm$Break_Point,break_point)/n,
+      PDR_FDR(estimation_cpm$raw_beta,raw_Beta),
+      PDR_bias(estimation_cpm$raw_beta,raw_Beta))
+    )
+    result_bcp=rbind(result_SIFS,c(
+      dist_err(break_point,estimation_bcp$Break_Point)/n,
+      dist_err(estimation_bcp$Break_Point,break_point)/n,
+      PDR_FDR(estimation_bcp$raw_beta,raw_Beta),
+      PDR_bias(estimation_bcp$raw_beta,raw_Beta))
+    )
+    result_ecp=rbind(result_SIFS,c(
+      dist_err(break_point,estimation_ecp$Break_Point)/n,
+      dist_err(estimation_ecp$Break_Point,break_point)/n,
+      PDR_FDR(estimation_ecp$raw_beta,raw_Beta),
+      PDR_bias(estimation_ecp$raw_beta,raw_Beta))
+    )
     print(i)
 }
-sim_list2=list(SIFS_normalized=result_SIFS_nor,LS_TV1=result_LSTV_1,LS_TV2=result_LSTV_2)
-makeTable(sim_list2)
-
+sim_list=list(SIFS=result_SIFS,LS_TV1=result_LSTV_1,LS_TV2=result_LSTV_2,CPM=result_cpm,BCP=result_bcp,ECP=result_ecp)
+makeTable(sim_list)
+sim_list_2000=sim_list
 
 
 ####################################  Covariates Involved   ##############################################
