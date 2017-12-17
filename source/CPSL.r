@@ -1,4 +1,6 @@
 require(lars)
+require(Rcpp)
+sourceCpp("./slasso.cpp")
 require(MASS)
 require(cpm)
 require(bcp)
@@ -140,10 +142,11 @@ SIFS = function(X,Y,n,p,normalize=TRUE){
     if(normalize){
         X[,-1]=scale(X[,-1])
         Z=scale(Z)
+        Y=scale(Y)
     }
     ################
     S1 = NULL
-    SA=1:(n-1)*(p+1)
+    SA=1:((n-1)*(p+1))
     ebic=Inf
     H = diag(1,n)- X%*%solve(t(X)%*%X)%*%t(X)
     
@@ -164,7 +167,7 @@ SIFS = function(X,Y,n,p,normalize=TRUE){
         rm(tempr)
         
         new_ebic=EBIC(new_S,new_H)
-        
+        print(c(new_ebic,temp_s))
         if(new_ebic>ebic | length(S1)==(n-1)*(p+1)){
             break
         } else {
@@ -432,7 +435,7 @@ ECP  = function(Y){
 
 #############################################   No Covariates   ###################################################
 ##Settings
-n=5000
+n=100
 sigma=0.05
 p=0
 K=12
